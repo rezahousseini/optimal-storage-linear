@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <glpk.h>
 
-DEFUN_DLD(optimal1StorageV2_4, args, nargout, "filename, N")
+DEFUN_DLD(optimal1StorageV2_6, args, nargout, "filename, N, method")
 {
 	octave_value_list retval;
 	int nargin = args.length();
@@ -13,7 +13,6 @@ DEFUN_DLD(optimal1StorageV2_4, args, nargout, "filename, N")
 	{
 		charMatrix name = args(0).char_matrix_value();
 		int N = args(1).int_value();
-		charMatrix method = args(2).char_matrix_value();
 
 		charMatrix suffixDat = ".dat";
 		charMatrix suffixMod = ".mod";
@@ -23,10 +22,12 @@ DEFUN_DLD(optimal1StorageV2_4, args, nargout, "filename, N")
 
 		glp_prob *lp;
 		glp_tran *tran;
+		glp_smcp parm;
 		int ret, k, nvar, m;
 
 		lp = glp_create_prob();
 		tran = glp_mpl_alloc_wksp();
+		glp_init_smcp(&parm);
 
 		name.insert(suffixMod, 0, len);
 		ret = glp_mpl_read_model(tran, name.row_as_string(0).c_str(), 1);
@@ -60,14 +61,9 @@ DEFUN_DLD(optimal1StorageV2_4, args, nargout, "filename, N")
 //			fprintf(stderr, "Error on writing MPS file\n");
 //		}
 
-		if(method == "simplex")
-		{
-			glp_simplex(lp, NULL);
-		}
-		elseif(method == "interior")
-		{
-			glp_interior(lp, NULL);
-		}
+		parm.msg_lev = GLP_MSG_ERR;
+
+		glp_simplex(lp, &parm);
 
 //		name.insert(suffixSol, 0, len);
 //		ret = glp_print_sol(lp, name.row_as_string(0).c_str());
