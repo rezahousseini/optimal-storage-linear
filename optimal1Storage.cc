@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <glpk.h>
 
-DEFUN_DLD(optimal1StorageV2_2, args, nargout, "optimal1StorageV2_2")
+DEFUN_DLD(optimal1StorageV2_3, args, nargout, "optimal1StorageV2_2")
 {
 	octave_value_list retval;
 	int nargin = args.length();
@@ -68,26 +68,23 @@ DEFUN_DLD(optimal1StorageV2_2, args, nargout, "optimal1StorageV2_2")
 //		}
 
 		skip: 
-		N = glp_get_num_cols(lp)/5;
+		N = glp_get_num_cols(lp)/4;
 		RowVector uc(N);
 		RowVector ud(N);
-		RowVector gs(N);
-		RowVector rs(N);
+		RowVector efr(N);
 		RowVector Q(N);
 		for(k=1; k<=N; k++)
 		{
 			uc.elem(k-1) = glp_get_col_prim(lp, k);
 			ud.elem(k-1) = glp_get_col_prim(lp, k+N);
-			gs.elem(k-1) = glp_get_col_prim(lp, k+2*N);
-			rs.elem(k-1) = glp_get_col_prim(lp, k+3*N);
-			Q.elem(k-1) = glp_get_col_prim(lp, k+4*N);
+			efr.elem(k-1) = glp_get_col_prim(lp, k+2*N);
+			Q.elem(k-1) = glp_get_col_prim(lp, k+3*N);
 		}
 
 		retval(0) = octave_value(uc);
 		retval(1) = octave_value(ud);
-		retval(2) = octave_value(gs);
-		retval(3) = octave_value(rs);
-		retval(4) = octave_value(Q);
+		retval(2) = octave_value(efr);
+		retval(3) = octave_value(Q);
 
 		glp_mpl_free_wksp(tran);
 		glp_delete_prob(lp);
