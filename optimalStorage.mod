@@ -1,4 +1,4 @@
-# Storage Optimiziation Problem V1
+# Storage Optimiziation Problem V2_3
 #
 # Author: Reza Housseini 
 
@@ -9,16 +9,13 @@ set I;
 param N;
 
 /* */
-param gf{i in I};
+param efi{i in I};
 
 /* */
-param rf{i in I};
+param pb{i in I};
 
 /* */
-param pn{i in I};
-
-/* */
-param pp{i in I};
+param ps{i in I};
 
 /* */
 param T;
@@ -57,13 +54,7 @@ param alphaq;
 param betaq;
 
 /* */
-param Gl{i in I};
-
-/* */
 param Gu{i in I};
-
-/* */
-param Rl{i in I};
 
 /* */
 param Ru{i in I};
@@ -75,19 +66,17 @@ param Gs{i in I};
 param Rs{i in I};
 
 /* Storage charge power */
-var uc{i in I}, >= 0, <= min(D, (1/nuc)*gf[i]/T);
+var uc{i in I}, >= 0, <= min(D, (1/nuc)*abs(efi[i])/T);
 
 /* Storage discharge power */
 var ud{i in I}, >= 0, <= C;
 
-var gs{i in I}, >= 0, <= Gs[i];
-
-var rs{i in I}, >= 0, <= Rs[i];
+var efr{i in I}, >= Rs[i], <= Gs[i];
 
 var Q{i in I}, >= Qmin, <= Qmax;
 
 /* Minimize overall costs */
-minimize cost: sum{i in I} pn[i]*(rf[i]+rs[i]-(gf[i]+gs[i]-uc[i]+ud[i]));
+minimize cost: sum{i in I} pb[i]*(efi[i]+efr[i]+uc[i]-ud[i]);
 
 s.t. degrad{i in I}: Q[i], = Qmax-alphaq*(ud[i]-uc[i])/(T*Qmax)-betaq*i;
 
@@ -103,20 +92,12 @@ s.t. qlb{i in I}: nul^i*q0+T*sum{k in 1..i} nul^(i-1-k)*(nuc*uc[k]-(1/nud)*ud[k]
 
 s.t. Dlimit{i in I}: ud[i], <= nud*(nul^i*q0+T*sum{k in 1..i} nul^(i-1-k)*(nuc*uc[k]-(1/nud)*ud[k]))/T;
 
-s.t. gs0lb: gs[1], >= -Gl[1];
+#s.t. efr0ub: efr[1], <= Gu[1];
 
-s.t. gs0ub: gs[1], <= Gu[1];
+#s.t. efr0lb: efr[1], >= -Ru[1];
 
-s.t. rs0lb: rs[1], >= -Rl[1];
+s.t. deltaefrub{k in 1..N-1}: efr[k+1], <= efr[k]+Gu[k+1];
 
-s.t. rs0ub: rs[1], <= Ru[1];
-
-s.t. deltagslb{k in 1..N-1}: gs[k+1], >= gs[k]-Gl[k+1];
-
-s.t. deltagsub{k in 1..N-1}: gs[k+1], <= gs[k]+Gu[k+1];
-
-s.t. deltarslb{k in 1..N-1}: rs[k+1], >= rs[k]-Rl[k+1];
-
-s.t. deltarsub{k in 1..N-1}: rs[k+1], <= rs[k]+Ru[k+1];
+s.t. deltaefrlb{k in 1..N-1}: efr[k+1], >= efr[k]-Ru[k+1];
 
 end;
