@@ -5,7 +5,7 @@
 
 using namespace std;
 
-DEFUN_DLD(writeOptimizationModelDataV2_1, args, nargout, "Writes the optimization model data")
+DEFUN_DLD(writeOptimizationModelData, args, nargout, "Writes the optimization model data")
 {
 	octave_value_list retval;
 	int k, m, nargin = args.length();

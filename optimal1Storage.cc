@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <glpk.h>
 
-DEFUN_DLD(optimal1StorageV2_6, args, nargout, "filename, N, method")
+DEFUN_DLD(optimal1Storage, args, nargout, "filename, N, method")
 {
 	octave_value_list retval;
 	int nargin = args.length();
