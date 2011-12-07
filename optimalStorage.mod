@@ -77,8 +77,13 @@ var gfr{i in I}, >= 0, <= G[i];
 
 var rfr{i in I}, >= 0, <= R[i];
 
+var ggr{i in I}, >= 0;
+
+var rgr{i in I}, >= 0;
+
+
 /* Minimize overall costs */
-minimize cost: sum{i in I} pn[i]*(rfi[i]+rfr[i]-gfi[i]-gfr[i]+T*(uc[i]-ud[i]));
+minimize cost: sum{i in I} pn[i]*ggr[i];
 
 s.t. degrad{i in I}: Q[i], = (if Qmax != 0 then Qmax-alphaq*T*(ud[i]-uc[i])/Qmax-betaq*i else 0);
 
@@ -102,6 +107,6 @@ s.t. deltagfrub{k in 1..N-1}: gfr[k+1], <= gfr[k]+Gu[k+1];
 
 s.t. deltarfrub{k in 1..N-1}: rfr[k+1], <= rfr[k]+Ru[k+1];
 
-#s.t. balance{i in I}: rfi[i]+rfr[i]-gfi[i]-gfr[i]+T*(uc[i]-ud[i]) >= 0;
+s.t. balance{i in I}: rfi[i]+rfr[i]+rgr[i]-gfi[i]-gfr[i]-ggr[i]+T*(uc[i]-ud[i]) = 0;
 
 end;
