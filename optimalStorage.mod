@@ -1,143 +1,96 @@
-# Storage Optimiziation Problem V2_6
+# Storage Optimiziation Problem
 #
 # Author: Reza Housseini 
 
 /* Set of all time steps */
 set I;
 
-/* Number of all time steps */
+/* Set of all storages */
+set A;
+
+/* Set of all storages with C,D and Qmax = inf */
+set E;
+
+/* Set of all storages with Qmax = inf */
+set F;
+
+/* Number of time steps */
 param N;
 
-/* */
-param gfi{i in I};
+/* Generated energy */
+param g{i in I};
 
-/* */
-param rfi{i in I};
+/* Requested energy */
+param r{i in I};
+
+/* Generated energy cost */
+param pg{i in I};
+
+/* Requested energy cost */
+param pr{i in I};
 
 /* Storage charge cost */
-param pc{i in I};
+param pc{a in (A union E union F), i in I};
 
 /* Storage discharge cost */
-param pd{i in I};
+param pd{a in (A union E union F), i in I};
 
-/* Grid energy import cost */
-param pggr{i in I};
-
-/* Fixed energy import cost */
-param pgfi{i in I};
-
-/* Free energy import cost */
-param pgfr{i in I};
-
-/* Grid energy export cost */
-param prgr{i in I};
-
-/* Fixed energy export cost */
-param prfi{i in I};
-
-/* Free energy export cost */
-param prfr{i in I};
-
-/* */
+/* Time step */
 param T;
 
-/* */
-param Qmax;
+/* Maximum storage capacity */
+param Qmax{a in (A union E union F)};
 
-/* */
-param Qmin;
+/* Minimum storage capacity */
+param Qmin{a in (A union E union F)};
 
-/* */
-param C;
+/* Maximum charge rate */
+param C{a in (A union E union F)};
 
-/* */
-param D;
+/* Maximum discharge rate */
+param D{a in (A union E union F)};
 
-/* */
-param nul;
+/* Efficiency of storage */
+param nul{a in (A union E union F)};
 
-/* */
-param nuc;
+/* Efficiency of charge */
+param nuc{a in (A union E union F)};
 
-/* */
-param nud;
+/* Efficiency of discharge */
+param nud{a in (A union E union F)};
 
-/* */
-param q0;
-
-/* */
-param CIst;
-
-/* */
-param alphaq;
-
-/* */
-param betaq;
-
-/* Maximum free energy delivery change rate */
-param Gu{i in I};
-
-/* Maximum free energy request change rate */
-param Ru{i in I};
-
-/* Maximum free energy delivery */
-param G{i in I};
-
-/* Maximum free energy request */
-param R{i in I};
+/* Initial capacity of storage */
+param q0{a in (A union E union F)};
 
 /* Storage charge power */
-var uc{i in I}, >= 0, <= min(D, (1/nuc)*gfi[i]/T);
+var uc{a in (A union E union F), i in I}, >= 0;
 
 /* Storage discharge power */
-var ud{i in I}, >= 0, <= C;
+var ud{a in (A union E union F), i in I}, >= 0;
 
-/* Free energy delivery */
-var gfr{i in I}, >= 0, <= G[i];
-
-/* Free energy request */
-var rfr{i in I}, >= 0, <= R[i];
-
-/* Grid energy delivery */
-var ggr{i in I}, >= 0;
-
-/* Grid energy request */
-var rgr{i in I}, >= 0;
-
+/* Real storage level */
+#var q{a in A, i in I}, >= Qmin[a], <= Qmax[a];
 
 /* Minimize overall costs */
-minimize cost: sum{i in I} (pc[i]*uc[i]+pd[i]*ud[i]+pggr[i]*ggr[i]+prgr[i]*rgr[i]+pgfi[i]*gfi[i]+prfi[i]*rfi[i]+pgfr[i]*gfr[i]+prfr[i]*rfr[i]);
-
-/* Storage degradation constraints */
-
-s.t. Q1: (if Qmax != 0 then Qmax-alphaq*T*(ud[1]-uc[1])/Qmax-betaq*1 else 0), = Qmax;
-
-s.t. Qlimit{k in 2..N}: (if Qmax != 0 then Qmax-alphaq*T*(ud[k]-uc[k])/Qmax-betaq*k else 0), <= (if Qmax != 0 then Qmax-alphaq*T*(ud[k-1]-uc[k-1])/Qmax-betaq*(k-1) else 0);
+minimize cost: sum{i in I} (pg[i]*g[i]+pr[i]*r[i]+sum{a in (A union E union F)} (pc[a,i]*uc[a,i]-pd[a,i]*ud[a,i]));
 
 /* Storage constraints */
 
+s.t. ucub{a in (A union F), i in I}: uc[a,i] <= C[a];
+
+s.t. udub{a in (A union F), i in I}: ud[a,i] <= D[a];
+
+#s.t. qstart{a in A}: q[a,1], = q0[a];
+
+#s.t. qnext{a in A, k in 2..N}: q[a,k], = nul[a]*q[a,k-1]+T*(nuc[a]*uc[a,k]-(1/nud[a])*ud[a,k]);
+
 /* q_i <= Qmax */
-s.t. qub{i in I}: nul^i*q0+T*sum{k in 1..i} nul^(i-1-k)*(nuc*uc[k]-(1/nud)*ud[k]), <= (if Qmax != 0 then Qmax-alphaq*T*(ud[i]-uc[i])/Qmax-betaq*i else 0);
+s.t. qub{a in A, i in I}: nul[a]^i*q0[a]+T*sum{k in 1..i} nul[a]^(i-1-k)*(nuc[a]*uc[a,k]-(1/nud[a])*ud[a,k]), <= Qmax[a];
 
 /* q_i >= Qmin */
-s.t. qlb{i in I}: nul^i*q0+T*sum{k in 1..i} nul^(i-1-k)*(nuc*uc[k]-(1/nud)*ud[k]), >= Qmin;
+s.t. qlb{a in A, i in I}: nul[a]^i*q0[a]+T*sum{k in 1..i} nul[a]^(i-1-k)*(nuc[a]*uc[a,k]-(1/nud[a])*ud[a,k]), >= Qmin[a];
 
-s.t. Dlimit{i in I}: ud[i], <= nud*(nul^i*q0+T*sum{k in 1..i} nul^(i-1-k)*(nuc*uc[k]-(1/nud)*ud[k]))/T;
-
-/* Prosumer node constraints */
-
-s.t. gfr0ub: gfr[1], <= Gu[1];
-
-s.t. rfr0lb: rfr[1], <= Ru[1];
-
-s.t. deltagfrubp{k in 1..N-1}: gfr[k+1], <= gfr[k]+Gu[k+1];
-
-s.t. deltagfrubn{k in 1..N-1}: gfr[k+1], >= gfr[k]-Gu[k+1];
-
-s.t. deltarfrubp{k in 1..N-1}: rfr[k+1], <= rfr[k]+Ru[k+1];
-
-s.t. deltarfrubn{k in 1..N-1}: rfr[k+1], >= rfr[k]-Ru[k+1];
-
-s.t. balance{i in I}: rfi[i]+rfr[i]+rgr[i]-gfi[i]-gfr[i]-ggr[i]+uc[i]-ud[i] = 0;
+/* Prosumer node constraint */
+s.t. balance{i in I}: sum{a in (A union E union F)}(uc[a,i]-ud[a,i]) = g[i]-r[i];
 
 end;

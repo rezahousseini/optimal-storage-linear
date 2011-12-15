@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <glpk.h>
 
-DEFUN_DLD(optimal1Storage, args, nargout, "filename, N, method")
+DEFUN_DLD(optimal1Storage, args, nargout, "filename, N")
 {
 	octave_value_list retval;
 	int nargin = args.length();
@@ -61,7 +61,7 @@ DEFUN_DLD(optimal1Storage, args, nargout, "filename, N, method")
 //			fprintf(stderr, "Error on writing MPS file\n");
 //		}
 
-		parm.msg_lev = GLP_MSG_ERR;
+		parm.msg_lev = GLP_MSG_ALL;
 
 		glp_simplex(lp, &parm);
 
