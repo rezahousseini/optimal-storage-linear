@@ -48,7 +48,7 @@ DEFUN_DLD(writeOptimizationModelData, args, nargout, "filename, Set, Param")
 			{
 				if(P.contents(k).array_value().elem(m) == 1.0/0.0)
 				{
-					s << " " << m+1 << " " << -1;
+					s << " " << m+1 << " " << "1e6";
 				}
 				else
 				{
@@ -63,7 +63,7 @@ DEFUN_DLD(writeOptimizationModelData, args, nargout, "filename, Set, Param")
 			{
 				if(P.contents(k).row_vector_value().elem(m) == 1.0/0.0)
 				{
-					s << " " << m+1 << " " << -1;
+					s << " " << m+1 << " " << "1e6";
 				}
 				else
 				{

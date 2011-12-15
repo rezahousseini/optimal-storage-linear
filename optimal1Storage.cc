@@ -3,16 +3,17 @@
 #include <stdlib.h>
 #include <glpk.h>
 
-DEFUN_DLD(optimal1Storage, args, nargout, "filename, N")
+DEFUN_DLD(optimal1Storage, args, nargout, "filename, N, A")
 {
 	octave_value_list retval;
 	int nargin = args.length();
-	if (nargin != 2)
+	if (nargin != 3)
 		print_usage();
 	else
 	{
 		charMatrix name = args(0).char_matrix_value();
 		int N = args(1).int_value();
+		int A = args(2).int_value();
 
 		charMatrix suffixDat = ".dat";
 		charMatrix suffixMod = ".mod";
@@ -23,7 +24,7 @@ DEFUN_DLD(optimal1Storage, args, nargout, "filename, N")
 		glp_prob *lp;
 		glp_tran *tran;
 		glp_smcp parm;
-		int ret, k, nvar, m;
+		int ret, nvar;
 
 		lp = glp_create_prob();
 		tran = glp_mpl_alloc_wksp();
@@ -54,12 +55,12 @@ DEFUN_DLD(optimal1Storage, args, nargout, "filename, N")
 
 		glp_mpl_build_prob(tran, lp);
 
-//		name.insert(suffixMps, 0, len);
-//		ret = glp_write_mps(lp, GLP_MPS_FILE, NULL, name.row_as_string(0).c_str());
-//		if (ret != 0)
-//		{
-//			fprintf(stderr, "Error on writing MPS file\n");
-//		}
+		name.insert(suffixMps, 0, len);
+		ret = glp_write_mps(lp, GLP_MPS_FILE, NULL, name.row_as_string(0).c_str());
+		if (ret != 0)
+		{
+			fprintf(stderr, "Error on writing MPS file\n");
+		}
 
 		parm.msg_lev = GLP_MSG_ALL;
 
@@ -74,14 +75,18 @@ DEFUN_DLD(optimal1Storage, args, nargout, "filename, N")
 
 		skip: 
 		nvar = glp_get_num_cols(lp)/N;
-		RowVector retVec(N);
-		for(m=0; m<nvar; m++)
+		RowVector retVec1(N);
+		RowVector retVec2(N);
+
+		for(int k=0; k<A; k++)
 		{
-			for(k=1; k<=N; k++)
+			for(int l=0; l<N; l++)
 			{
-				retVec.elem(k-1) = glp_get_col_prim(lp, k+m*N);
+				retVec1.elem(l) = glp_get_col_prim(lp, l*2+1+k*2*N);
+				retVec2.elem(l) = glp_get_col_prim(lp, l*2+2+k*2*N);
 			}
-			retval(m) = octave_value(retVec);
+			retval(k*2) = octave_value(retVec1);
+			retval(k*2+1) = octave_value(retVec2);
 		}
 
 		glp_mpl_free_wksp(tran);

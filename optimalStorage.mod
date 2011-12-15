@@ -69,10 +69,10 @@ var uc{a in (A union E union F), i in I}, >= 0;
 var ud{a in (A union E union F), i in I}, >= 0;
 
 /* Real storage level */
-#var q{a in A, i in I}, >= Qmin[a], <= Qmax[a];
+var q{a in A, i in I}, >= Qmin[a], <= Qmax[a];
 
 /* Minimize overall costs */
-minimize cost: sum{i in I} (pg[i]*g[i]+pr[i]*r[i]+sum{a in (A union E union F)} (pc[a,i]*uc[a,i]-pd[a,i]*ud[a,i]));
+minimize cost: sum{i in I} (pg[i]*g[i]+pr[i]*r[i]+sum{a in (A union E union F)} (pc[a,i]*uc[a,i]+pd[a,i]*ud[a,i]));
 
 /* Storage constraints */
 
@@ -80,15 +80,15 @@ s.t. ucub{a in (A union F), i in I}: uc[a,i] <= C[a];
 
 s.t. udub{a in (A union F), i in I}: ud[a,i] <= D[a];
 
-#s.t. qstart{a in A}: q[a,1], = q0[a];
+s.t. qstart{a in A}: q[a,1], = q0[a];
 
-#s.t. qnext{a in A, k in 2..N}: q[a,k], = nul[a]*q[a,k-1]+T*(nuc[a]*uc[a,k]-(1/nud[a])*ud[a,k]);
+s.t. qnext{a in A, k in 2..N}: q[a,k], = nul[a]*q[a,k-1]+T*(nuc[a]*uc[a,k]-(1/nud[a])*ud[a,k]);
 
 /* q_i <= Qmax */
-s.t. qub{a in A, i in I}: nul[a]^i*q0[a]+T*sum{k in 1..i} nul[a]^(i-1-k)*(nuc[a]*uc[a,k]-(1/nud[a])*ud[a,k]), <= Qmax[a];
+#s.t. qub{a in A, i in I}: nul[a]^i*q0[a]+T*sum{k in 1..i} nul[a]^(i-1-k)*(nuc[a]*uc[a,k]-(1/nud[a])*ud[a,k]), <= Qmax[a];
 
 /* q_i >= Qmin */
-s.t. qlb{a in A, i in I}: nul[a]^i*q0[a]+T*sum{k in 1..i} nul[a]^(i-1-k)*(nuc[a]*uc[a,k]-(1/nud[a])*ud[a,k]), >= Qmin[a];
+#s.t. qlb{a in A, i in I}: nul[a]^i*q0[a]+T*sum{k in 1..i} nul[a]^(i-1-k)*(nuc[a]*uc[a,k]-(1/nud[a])*ud[a,k]), >= Qmin[a];
 
 /* Prosumer node constraint */
 s.t. balance{i in I}: sum{a in (A union E union F)}(uc[a,i]-ud[a,i]) = g[i]-r[i];

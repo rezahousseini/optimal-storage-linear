@@ -10,11 +10,11 @@ t=n*T;
 
 A=2;
 
-S.Qmax=[1,Inf];
+S.Qmax=[4,Inf];
 S.Qmin=[0,0];
 S.q0=[1,Inf];
-S.C=[0.3,Inf];
-S.D=[0.3,Inf];
+S.C=[0.5,Inf];
+S.D=[0.5,Inf];
 S.nul=[1,1];
 S.nuc=[1,1];
 S.nud=[1,1];
@@ -61,7 +61,7 @@ writeOptimizationModelData(filename,Set,Param);
 %mkoctfile optimal1Storage.cc -lglpk
 
 tic;
-[ucS,udS,ucG,udG]=optimal1Storage(filename,N);
+[ucS,ucG,udS,udG]=optimal1Storage(filename,N,A);
 toc;
 
 %q=zeros(1,N);
@@ -74,5 +74,5 @@ figure(1)
 plot(t,r,t,g,t,g+udS-ucS)
 legend("Nachfrage","Produktion ohne Speicher","Produktion mit Speicher")
 
-%figure(2)
-%plot(t,ucS-udS+ucG-udG+r-g)
+figure(2)
+plot(t,ucS-udS+ucG-udG+r-g)
