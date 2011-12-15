@@ -24,7 +24,7 @@ DEFUN_DLD(optimal1Storage, args, nargout, "filename, N, A")
 		glp_prob *lp;
 		glp_tran *tran;
 		glp_smcp parm;
-		int ret, nvar;
+		int ret;
 
 		lp = glp_create_prob();
 		tran = glp_mpl_alloc_wksp();
@@ -74,20 +74,20 @@ DEFUN_DLD(optimal1Storage, args, nargout, "filename, N, A")
 //		}
 
 		skip: 
-		nvar = glp_get_num_cols(lp)/N;
-		RowVector retVec1(N);
-		RowVector retVec2(N);
+		Matrix uc(A,N);
+		Matrix ud(A,N);
 
-		for(int k=0; k<A; k++)
+		for(int l=0; l<N; l++)
 		{
-			for(int l=0; l<N; l++)
+			for(int k=0; k<A; k++)
 			{
-				retVec1.elem(l) = glp_get_col_prim(lp, l*2+1+k*2*N);
-				retVec2.elem(l) = glp_get_col_prim(lp, l*2+2+k*2*N);
+				uc.elem(k,l) = glp_get_col_prim(lp, A*l+k+1);
+				ud.elem(k,l) = glp_get_col_prim(lp, A*l+k+1+A*N);
 			}
-			retval(k*2) = octave_value(retVec1);
-			retval(k*2+1) = octave_value(retVec2);
 		}
+		
+		retval(0) = octave_value(uc);
+		retval(1) = octave_value(ud);
 
 		glp_mpl_free_wksp(tran);
 		glp_delete_prob(lp);

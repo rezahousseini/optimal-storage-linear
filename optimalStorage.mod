@@ -84,12 +84,6 @@ s.t. qstart{a in A}: q[a,1], = q0[a];
 
 s.t. qnext{a in A, k in 2..N}: q[a,k], = nul[a]*q[a,k-1]+T*(nuc[a]*uc[a,k]-(1/nud[a])*ud[a,k]);
 
-/* q_i <= Qmax */
-#s.t. qub{a in A, i in I}: nul[a]^i*q0[a]+T*sum{k in 1..i} nul[a]^(i-1-k)*(nuc[a]*uc[a,k]-(1/nud[a])*ud[a,k]), <= Qmax[a];
-
-/* q_i >= Qmin */
-#s.t. qlb{a in A, i in I}: nul[a]^i*q0[a]+T*sum{k in 1..i} nul[a]^(i-1-k)*(nuc[a]*uc[a,k]-(1/nud[a])*ud[a,k]), >= Qmin[a];
-
 /* Prosumer node constraint */
 s.t. balance{i in I}: sum{a in (A union E union F)}(uc[a,i]-ud[a,i]) = g[i]-r[i];
 

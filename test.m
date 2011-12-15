@@ -8,16 +8,16 @@ T=1;
 n=0:N-1;
 t=n*T;
 
-A=2;
+S.Qmax=[5,3,2,Inf];
+S.Qmin=[0,0,0,0];
+S.q0=[5,3,2,Inf];
+S.C=[0.1,0.3,0.5,Inf];
+S.D=[0.1,0.3,0.5,Inf];
+S.nul=[1,1,1,1];
+S.nuc=[1,1,1,1];
+S.nud=[1,1,1,1];
 
-S.Qmax=[4,Inf];
-S.Qmin=[0,0];
-S.q0=[1,Inf];
-S.C=[0.5,Inf];
-S.D=[0.5,Inf];
-S.nul=[1,1];
-S.nuc=[1,1];
-S.nud=[1,1];
+A=length(S.Qmax);
 
 u=zeros(1,N);
 for k= 2:N
@@ -31,9 +31,9 @@ r=exp(0.18+0.4*cos(2*pi.*n*T/24-pi)+u+normrnd(0,0.1,1,N));
 % Set of time steps
 Set.I=1:N;
 % Set of storage variables with no inf
-Set.A=1;
+Set.A=[1,2,3];
 % Set of storage variables with C,D and Qmax = Inf
-Set.E=2;
+Set.E=[4];
 % Set of storage variables with Qmax = Inf
 Set.F=[];
 
@@ -42,7 +42,7 @@ Param.g=g;
 Param.r=r;
 Param.pg=zeros(1,N);
 Param.pr=zeros(1,N);
-Param.pc=[zeros(1,N);p];
+Param.pc=[zeros(A-1,N);p];
 Param.pd=zeros(A,N);
 Param.T=T;
 Param.Qmax=S.Qmax;
@@ -61,7 +61,7 @@ writeOptimizationModelData(filename,Set,Param);
 %mkoctfile optimal1Storage.cc -lglpk
 
 tic;
-[ucS,ucG,udS,udG]=optimal1Storage(filename,N,A);
+[uc,ud]=optimal1Storage(filename,N,A);
 toc;
 
 %q=zeros(1,N);
@@ -71,8 +71,5 @@ toc;
 %endfor
 
 figure(1)
-plot(t,r,t,g,t,g+udS-ucS)
+plot(t,r,t,g,t,g+ud(1,:)+ud(2,:)-uc(1,:)-uc(2,:))
 legend("Nachfrage","Produktion ohne Speicher","Produktion mit Speicher")
-
-figure(2)
-plot(t,ucS-udS+ucG-udG+r-g)
