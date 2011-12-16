@@ -8,11 +8,11 @@ T=1;
 n=0:N-1;
 t=n*T;
 
-S.Qmax=[5,3,2,Inf];
-S.Qmin=[0,0,0,0];
-S.q0=[5,3,2,Inf];
-S.C=[0.1,0.3,0.5,Inf];
-S.D=[0.1,0.3,0.5,Inf];
+S.Qmax=[7,3,2,Inf];
+S.Qmin=[0,0,0,Inf];
+S.q0=[7,3,2,Inf];
+S.C=[0.1,0.3,0.5,0.5];
+S.D=[0.1,0.3,0.5,0.5];
 S.nul=[1,1,1,1];
 S.nuc=[1,1,1,1];
 S.nud=[1,1,1,1];
@@ -25,17 +25,15 @@ for k= 2:N
 endfor
 
 g=exp(0.16+0.1*cos(2*pi.*n*T/24-5*pi/4)+u+normrnd(0,0.1,1,N));
-p=exp(0.1+0.4*cos(2*pi.*n*T/24-3*pi/2)+u+normrnd(0,0.1,1,N));
+p=ones(1,N);%exp(0.1+0.4*cos(2*pi.*n*T/24-3*pi/2)+u+normrnd(0,0.1,1,N));
 r=exp(0.18+0.4*cos(2*pi.*n*T/24-pi)+u+normrnd(0,0.1,1,N));
 
 % Set of time steps
 Set.I=1:N;
-% Set of storage variables with no inf
+% Set of storage variables with Qmax < inf
 Set.A=[1,2,3];
-% Set of storage variables with C,D and Qmax = Inf
-Set.E=[4];
 % Set of storage variables with Qmax = Inf
-Set.F=[];
+Set.F=[4];
 
 Param.N=N;
 Param.g=g;
