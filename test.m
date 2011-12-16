@@ -31,9 +31,9 @@ r=exp(0.18+0.4*cos(2*pi.*n*T/24-pi)+u+normrnd(0,0.1,1,N));
 % Set of time steps
 Set.I=1:N;
 % Set of storage variables with Qmax < inf
-Set.A=[1,2,3];
+Set.F=[1,2,3];
 % Set of storage variables with Qmax = Inf
-Set.F=[4];
+Set.E=[4];
 
 Param.N=N;
 Param.g=g;
