@@ -59,7 +59,7 @@ writeOptimizationModelData(filename,Set,Param);
 %mkoctfile optimal1Storage.cc -lglpk
 
 tic;
-[uc,ud]=optimal1Storage(filename,N,A);
+[uc,ud]=optimalNStorage(filename,N,A);
 toc;
 
 %q=zeros(1,N);

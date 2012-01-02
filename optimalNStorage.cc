@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <glpk.h>
 
-DEFUN_DLD(optimal1Storage, args, nargout, "filename, N, A")
+DEFUN_DLD(optimalNStorage, args, nargout, "filename, numN, numS")
 {
 	octave_value_list retval;
 	int nargin = args.length();
@@ -77,9 +77,9 @@ DEFUN_DLD(optimal1Storage, args, nargout, "filename, N, A")
 		Matrix uc(A,N);
 		Matrix ud(A,N);
 
-		for(int l=0; l<N; l++)
+		for (int l=0; l<N; l++)
 		{
-			for(int k=0; k<A; k++)
+			for (int k=0; k<A; k++)
 			{
 				uc.elem(k,l) = glp_get_col_prim(lp, A*l+k+1);
 				ud.elem(k,l) = glp_get_col_prim(lp, A*l+k+1+A*N);
