@@ -95,9 +95,9 @@ s.t. udnextupper{a in (F union E), k in 2..N}: ud[a,k], <= ud[a,k-1]+DeltaDmax[a
 
 s.t. udnextlower{a in (F union E), k in 2..N}: ud[a,k], >= ud[a,k-1]-DeltaDmax[a];
 
-s.t. uboundupper{a in (F union E), i in I}: ud[a,i]-uc[a,i], <= DeltaCmax[a];
+s.t. uboundupper{a in (F union E), k in 2..N}: (ud[a,k]-uc[a,k])-(ud[a,k-1]-uc[a,k-1]), <= DeltaCmax[a];
 
-s.t. uboundlower{a in (F union E), i in I}: ud[a,i]-uc[a,i], >= -DeltaDmax[a];
+s.t. uboundlower{a in (F union E), k in 2..N}: (ud[a,k]-uc[a,k])-(ud[a,k-1]-uc[a,k-1]), >= -DeltaDmax[a];
 
 /* Prosumer node constraint */
 s.t. balance{i in I}: sum{a in (F union E)}(uc[a,i]-ud[a,i]) = g[i]-r[i];

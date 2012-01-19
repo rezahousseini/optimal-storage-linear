@@ -4,7 +4,7 @@ close all;
 filename="optimalStorage";
 
 numN=100;
-T=1/8;
+T=1/4;
 n=0:numN-1;
 t=n*T;
 
@@ -16,8 +16,8 @@ S.D=[1,10];
 S.nul=[1,1];
 S.nuc=[1,1];
 S.nud=[1,1];
-S.DeltaCmax=[0.3,10];
-S.DeltaDmax=[0.3,10];
+S.DeltaCmax=[0.1,10];
+S.DeltaDmax=[0.2,10];
 
 numS=length(S.Qmax);
 
