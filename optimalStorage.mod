@@ -48,13 +48,13 @@ param C{a in (F union E)};
 param D{a in (F union E)};
 
 /* Efficiency of storage */
-param nul{a in (F union E)};
+param etal{a in (F union E)};
 
 /* Efficiency of charge */
-param nuc{a in (F union E)};
+param etac{a in (F union E)};
 
 /* Efficiency of discharge */
-param nud{a in (F union E)};
+param etad{a in (F union E)};
 
 /* Initial capacity of storage */
 param q0{a in (F union E)};
@@ -81,7 +81,7 @@ minimize cost: sum{i in I} (pg[i]*g[i]+pr[i]*r[i]+sum{a in (F union E)} (pc[a,i]
 
 s.t. qstart{a in F}: q[a,1], = q0[a];
 
-s.t. qnext{a in F, k in 2..N}: q[a,k], = nul[a]*q[a,k-1]+T*(nuc[a]*uc[a,k]-(1/nud[a])*ud[a,k]);
+s.t. qnext{a in F, k in 2..N}: q[a,k], = etal[a]*q[a,k-1]+T*(etac[a]*uc[a,k]-(1/etad[a])*ud[a,k]);
 
 /*s.t. ucstart{a in (F union E)}: uc[a,1], = 0;*/
 
@@ -95,11 +95,13 @@ s.t. udnextupper{a in (F union E), k in 2..N}: ud[a,k], <= ud[a,k-1]+DeltaDmax[a
 
 s.t. udnextlower{a in (F union E), k in 2..N}: ud[a,k], >= ud[a,k-1]-DeltaDmax[a];
 
-s.t. uboundupper{a in (F union E), k in 2..N}: (ud[a,k]-uc[a,k])-(ud[a,k-1]-uc[a,k-1]), <= DeltaCmax[a];
+/*s.t. uboundupper{a in (F union E), k in 2..N}: (ud[a,k]-uc[a,k])-(ud[a,k-1]-uc[a,k-1]), <= DeltaCmax[a];*/
 
-s.t. uboundlower{a in (F union E), k in 2..N}: (ud[a,k]-uc[a,k])-(ud[a,k-1]-uc[a,k-1]), >= -DeltaDmax[a];
+/*s.t. uboundlower{a in (F union E), k in 2..N}: (ud[a,k]-uc[a,k])-(ud[a,k-1]-uc[a,k-1]), >= -DeltaDmax[a];*/
 
 /* Prosumer node constraint */
-s.t. balance{i in I}: sum{a in (F union E)}(uc[a,i]-ud[a,i]) = g[i]-r[i];
+/*s.t. balance{i in I}: sum{a in (F union E)}(uc[a,i]-ud[a,i]) = g[i]-r[i];*/
+s.t. balanceC{i in I}: sum{a in (F union E)} uc[a,i] = (g[i]-r[i]+abs(g[i]-r[i]))/2;
+s.t. balanceD{i in I}: sum{a in (F union E)} ud[a,i] = (r[i]-g[i]+abs(r[i]-g[i]))/2;
 
 end;

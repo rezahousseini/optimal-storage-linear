@@ -30,9 +30,9 @@ DEFUN_DLD(optimalNStorage, args, nargout, "filename, Set, Param")
 		FloatNDArray q0 = Param.contents("q0").array_value();
 		FloatNDArray C = Param.contents("C").array_value();
 		FloatNDArray D = Param.contents("D").array_value();
-		FloatNDArray nul = Param.contents("nul").row_vector_value();
-		FloatNDArray nuc = Param.contents("nuc").row_vector_value();
-		FloatNDArray nud = Param.contents("nud").row_vector_value();
+		FloatNDArray etal = Param.contents("etal").row_vector_value();
+		FloatNDArray etac = Param.contents("etac").row_vector_value();
+		FloatNDArray etad = Param.contents("etad").row_vector_value();
 		FloatNDArray pg = Param.contents("pg").array_value();
 		FloatNDArray pr = Param.contents("pr").array_value();
 		FloatNDArray pc = Param.contents("pc").array_value();
@@ -115,13 +115,15 @@ DEFUN_DLD(optimalNStorage, args, nargout, "filename, Set, Param")
 			cost(l) = cost(l)+g(l)*pg(l)+r(l)*pr(l);
 		}
 		
+//		printf("cost=%f\n", glp_get_obj_val(lp));
+		
 		for (int m=0; m<numSfin; m++)
 		{
 			q(m, 0) = q0(m);
 			
 			for(int k=1; k<numN; k++)
 			{
-				q(m, k) = nul(m)*q(m, k-1)+T*(nuc(m)*uc(m, k)-(1/nud(m))*ud(m, k));
+				q(m, k) = etal(m)*q(m, k-1)+T*(etac(m)*uc(m, k)-(1/etad(m))*ud(m, k));
 			}
 		}
 		
